@@ -8,6 +8,8 @@ import { TOKEN_EXPIRED } from "@/constants/errors"
 import FetchInstance from "@/lib/fetch-instance"
 import HttpError from "@/lib/http-error"
 
+// FYI: This function is not implemented in the snippet.
+// TODO: Implement this function with firebase auth.
 export async function GetUserProfile(props: GetUserProfileProps) {
   const payload = {
     url: `/users/${props.user_id}/profile`,

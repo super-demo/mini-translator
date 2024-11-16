@@ -53,6 +53,7 @@ export default function AuthOptions(): NextAuthOptions {
         }
         return true
       },
+
       jwt: async ({ token, user }) => {
         if (user) {
           return {

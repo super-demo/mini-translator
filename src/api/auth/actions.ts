@@ -11,6 +11,8 @@ import { USER_NOT_FOUND } from "@/constants/errors"
 import FetchInstance from "@/lib/fetch-instance"
 import HttpError from "@/lib/http-error"
 
+// FYI: This function is not implemented in the snippet.
+// TODO: Implement this function with firebase auth.
 export async function GoogleSignIn(props: GoogleSignInProps) {
   const payload = {
     url: "/auth/login/google",

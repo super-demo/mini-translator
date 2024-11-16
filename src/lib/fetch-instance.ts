@@ -17,10 +17,8 @@ interface FetechInstanceProps {
 }
 
 export default async function FetchInstance(props: FetechInstanceProps) {
-  // FYI: This is a dummy session and access token.
-  // TODO: Replace this with actual session and access token.
   const session = await getServerSession(AuthOptions())
-  const accessToken = session
+  const accessToken = session?.user.jwt.access_token
 
   const defaultHeaders: HeadersInit = {
     Authorization: `Bearer ${accessToken}`
