@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowUpDown } from "lucide-react"
+import { ArrowUpDown, Download, Upload } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 
 import { GetTranslateText } from "@/api/translator/actions"
@@ -55,6 +55,44 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
     setOutputText(tempText)
   }
 
+  function HandleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const validTypes = [
+      "application/pdf",
+      "text/plain",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ] as const
+
+    if (!validTypes.includes(file.type as (typeof validTypes)[number])) {
+      alert("Please upload a valid file")
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      const text = e.target?.result
+      if (typeof text === "string") {
+        setInputText(text)
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  function HandleDownload() {
+    if (!outputText) return
+
+    const blob = new Blob([outputText], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `translated-to-${outputLanguage}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   useEffect(() => {
     const debounce = setTimeout(() => {
       if (inputText) {
@@ -106,9 +144,32 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
             onChange={(e) => setInputText(e.target.value.slice(0, 5000))}
             placeholder="Enter text to translate..."
           />
-          <span className="text-sm text-muted-foreground">
-            {inputText.length} / 5000
-          </span>
+          <div className="mt-4 flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">
+              {inputText.length} / 5000
+            </span>
+            <div className="flex gap-2">
+              <input
+                type="file"
+                id="file-upload"
+                className="hidden"
+                onChange={HandleFileUpload}
+                accept=".txt,.pdf,.doc,.docx"
+              />
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const fileInput = document.getElementById(
+                    "file-upload"
+                  ) as HTMLInputElement
+                  fileInput?.click()
+                }}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                Upload File
+              </Button>
+            </div>
+          </div>
         </div>
 
         <div>
@@ -154,6 +215,16 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Translation will appear here..."
           />
+          <div className="mt-4 flex justify-end">
+            <Button
+              variant="outline"
+              onClick={HandleDownload}
+              disabled={!outputText}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Download
+            </Button>
+          </div>
         </div>
       </div>
     </div>
