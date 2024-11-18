@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react"
 
 import { GetTranslateText } from "@/api/translator/actions"
 import { TranslateLanguagesResponse } from "@/api/translator/types"
+import Container from "@/components/container"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -104,9 +105,9 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
   }, [inputText, HandleTranslate])
 
   return (
-    <div className="max-h-screen">
-      <div className="">
-        <div>
+    <Container>
+      <div className="flex w-full flex-col gap-4">
+        <div className="flex flex-col gap-4">
           <Select
             name="input-language"
             value={inputLanguage}
@@ -143,8 +144,9 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
             value={inputText}
             onChange={(e) => setInputText(e.target.value.slice(0, 5000))}
             placeholder="Enter text to translate..."
+            className="h-32"
           />
-          <div className="mt-4 flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">
               {inputText.length} / 5000
             </span>
@@ -183,7 +185,7 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
           </Button>
         </div>
 
-        <div>
+        <div className="flex flex-col gap-4">
           <Select
             name="output-language"
             value={outputLanguage}
@@ -214,8 +216,9 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
             value={outputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Translation will appear here..."
+            className="h-32"
           />
-          <div className="mt-4 flex justify-end">
+          <div className="flex justify-end">
             <Button
               variant="outline"
               onClick={HandleDownload}
@@ -227,6 +230,6 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
           </div>
         </div>
       </div>
-    </div>
+    </Container>
   )
 }
