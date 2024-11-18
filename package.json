@@ -1,6 +1,6 @@
 {
   "name": "mini-translator",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -11,6 +11,9 @@
     "lint:fix": "next lint --fix"
   },
   "dependencies": {
+    "@radix-ui/react-dropdown-menu": "^2.1.2",
+    "@radix-ui/react-select": "^2.1.2",
+    "@radix-ui/react-slot": "^1.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "jwt-decode": "^4.0.0",
