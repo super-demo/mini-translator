@@ -7,3 +7,9 @@ export interface TranslateLanguagesResponse {
     }
   }
 }
+
+export interface GetTranslateTextProps {
+  input_language: string
+  output_language: string
+  text: string
+}
