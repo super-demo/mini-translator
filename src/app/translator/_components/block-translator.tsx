@@ -11,6 +11,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
@@ -20,9 +21,7 @@ interface BlockTranslatorProps {
   languagesData: TranslateLanguagesResponse
 }
 
-export default function BlockTranslator({
-  languagesData
-}: BlockTranslatorProps) {
+export default function BlockTranslator(props: BlockTranslatorProps) {
   const [inputText, setInputText] = useState<string>("")
   const [outputText, setOutputText] = useState<string>("")
   const [inputLanguage, setInputLanguage] = useState<string>("auto")
@@ -134,15 +133,20 @@ export default function BlockTranslator({
             value={inputLanguage}
             onValueChange={setInputLanguage}
           >
-            <SelectTrigger className="hover:bg-black/ w-[160px] border-none bg-transparent font-semibold transition-colors">
+            <SelectTrigger className="w-[160px] border-none bg-transparent font-semibold transition-colors hover:bg-black/5">
               <SelectValue placeholder="Select language" />
             </SelectTrigger>
-            <SelectContent className="font-semibold">
+            <SelectContent>
               <SelectGroup>
+                <SelectLabel>What us to figure it out?</SelectLabel>
                 <SelectItem key="auto" value="auto">
                   Auto-Detection
                 </SelectItem>
-                {Object.entries(languagesData.translation).map(
+              </SelectGroup>
+
+              <SelectGroup>
+                <SelectLabel>Languages</SelectLabel>
+                {Object.entries(props.languagesData.translation).map(
                   ([code, language]) => (
                     <SelectItem key={code} value={code}>
                       {language.name}
@@ -171,9 +175,10 @@ export default function BlockTranslator({
             <SelectTrigger className="w-[160px] border-none bg-transparent font-semibold transition-colors hover:bg-black/5">
               <SelectValue placeholder="Select language" />
             </SelectTrigger>
-            <SelectContent className="font-semibold">
+            <SelectContent>
               <SelectGroup>
-                {Object.entries(languagesData.translation).map(
+                <SelectLabel>Languages</SelectLabel>
+                {Object.entries(props.languagesData.translation).map(
                   ([code, language]) => (
                     <SelectItem key={code} value={code}>
                       {language.name}
