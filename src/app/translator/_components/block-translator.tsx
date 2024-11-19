@@ -244,7 +244,6 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
                 {inputText.length} / 5000
               </div>
               <div className="flex gap-1">
-                {/* Replace the existing Mic button with the new TranslatorMicrophone */}
                 <TranslatorMicrophone
                   onTranscript={HandleMicrophoneTranscript}
                 />

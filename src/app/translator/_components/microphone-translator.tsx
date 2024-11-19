@@ -48,10 +48,15 @@ interface SpeechRecognitionErrorEvent extends Event {
 
 interface MicrophoneProps {
   onTranscript: (text: string) => void
+  onRealTimeTranscript?: (text: string) => void
 }
 
-export function TranslatorMicrophone({ onTranscript }: MicrophoneProps) {
+export function TranslatorMicrophone({
+  onTranscript,
+  onRealTimeTranscript
+}: MicrophoneProps) {
   const [isRecording, setIsRecording] = useState(false)
+  const [currentTranscript, setCurrentTranscript] = useState<string>("")
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -59,7 +64,7 @@ export function TranslatorMicrophone({ onTranscript }: MicrophoneProps) {
     setIsRecording(true)
     recognitionRef.current = new window.webkitSpeechRecognition()
     recognitionRef.current.continuous = false
-    recognitionRef.current.interimResults = false
+    recognitionRef.current.interimResults = true
     recognitionRef.current.lang = "en-US"
 
     let finalTranscript = ""
@@ -69,7 +74,15 @@ export function TranslatorMicrophone({ onTranscript }: MicrophoneProps) {
         const result = event.results[i]
         const transcript = result[0].transcript.trim()
 
-        if (result.isFinal) finalTranscript += transcript + " "
+        if (result.isFinal) {
+          finalTranscript += transcript + " "
+          onTranscript(finalTranscript.trim())
+        } else {
+          setCurrentTranscript(transcript)
+          if (onRealTimeTranscript) {
+            onRealTimeTranscript(transcript)
+          }
+        }
       }
 
       // Clear previous timeout
@@ -98,6 +111,7 @@ export function TranslatorMicrophone({ onTranscript }: MicrophoneProps) {
     if (recognitionRef.current) {
       recognitionRef.current.stop()
       setIsRecording(false)
+      setCurrentTranscript("")
     }
     if (speechTimeoutRef.current) {
       clearTimeout(speechTimeoutRef.current)
@@ -119,6 +133,7 @@ export function TranslatorMicrophone({ onTranscript }: MicrophoneProps) {
       className="rounded-full hover:bg-black/5"
       onClick={isRecording ? stopRecording : startRecording}
     >
+      {isRecording && <div className="text-sm">{currentTranscript}</div>}
       <Mic className={`h-4 w-4 ${isRecording ? "text-red-500" : ""}`} />
     </Button>
   )
