@@ -1,10 +1,11 @@
 "use client"
 
-import { ArrowUpDown, Copy, Mic, Play, Star, Upload } from "lucide-react"
+import { ArrowUpDown, Copy, Play, Star, Upload } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { GetTranslateText } from "@/api/translator/actions"
 import { TranslateLanguagesResponse } from "@/api/translator/types"
+import { TranslatorMicrophone } from "@/app/translator/_components/microphone-translator"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -44,6 +45,15 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
       console.error(error)
     }
   }, [inputText, inputLanguage, outputLanguage])
+
+  const HandleMicrophoneTranscript = useCallback(
+    (transcript: string) => {
+      setInputText(transcript)
+      // Optionally, you can automatically trigger translation here
+      HandleTranslate()
+    },
+    [setInputText, HandleTranslate]
+  )
 
   function HandleSwapLanguages() {
     if (inputLanguage === "auto") return
@@ -235,13 +245,11 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
                 {inputText.length} / 5000
               </div>
               <div className="flex gap-1">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="rounded-full hover:bg-black/5"
-                >
-                  <Mic className="h-4 w-4" />
-                </Button>
+                {/* Replace the existing Mic button with the new TranslatorMicrophone */}
+                <TranslatorMicrophone
+                  onTranscript={HandleMicrophoneTranscript}
+                />
+
                 <input
                   type="file"
                   id="file-upload"
