@@ -49,7 +49,6 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
   const HandleMicrophoneTranscript = useCallback(
     (transcript: string) => {
       setInputText(transcript)
-      // Optionally, you can automatically trigger translation here
       HandleTranslate()
     },
     [setInputText, HandleTranslate]

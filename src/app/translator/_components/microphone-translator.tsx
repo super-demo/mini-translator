@@ -1,7 +1,7 @@
 "use client"
 
 import { Mic } from "lucide-react"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 
@@ -22,6 +22,7 @@ interface SpeechRecognition {
 }
 
 interface SpeechRecognitionEvent extends Event {
+  resultIndex: number
   results: SpeechRecognitionResultList
 }
 
@@ -52,19 +53,37 @@ interface MicrophoneProps {
 export function TranslatorMicrophone({ onTranscript }: MicrophoneProps) {
   const [isRecording, setIsRecording] = useState(false)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const startRecording = () => {
     setIsRecording(true)
     recognitionRef.current = new window.webkitSpeechRecognition()
-    recognitionRef.current.continuous = true
+    recognitionRef.current.continuous = false
     recognitionRef.current.interimResults = false
     recognitionRef.current.lang = "en-US"
 
+    let finalTranscript = ""
+
     recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
-      const transcript =
-        event.results[event.results.length - 1][0].transcript.trim()
-      onTranscript(transcript)
-      stopRecording()
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const result = event.results[i]
+        const transcript = result[0].transcript.trim()
+
+        if (result.isFinal) finalTranscript += transcript + " "
+      }
+
+      // Clear previous timeout
+      if (speechTimeoutRef.current) {
+        clearTimeout(speechTimeoutRef.current)
+      }
+
+      // Set new timeout to stop recording after 1.5 seconds of silence
+      speechTimeoutRef.current = setTimeout(() => {
+        if (finalTranscript) {
+          onTranscript(finalTranscript.trim())
+          stopRecording()
+        }
+      }, 1500)
     }
 
     recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
@@ -80,7 +99,18 @@ export function TranslatorMicrophone({ onTranscript }: MicrophoneProps) {
       recognitionRef.current.stop()
       setIsRecording(false)
     }
+    if (speechTimeoutRef.current) {
+      clearTimeout(speechTimeoutRef.current)
+    }
   }
+
+  useEffect(() => {
+    return () => {
+      if (speechTimeoutRef.current) {
+        clearTimeout(speechTimeoutRef.current)
+      }
+    }
+  }, [])
 
   return (
     <Button
