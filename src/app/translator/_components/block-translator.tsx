@@ -86,9 +86,14 @@ export default function BlockTranslator({
 
   function HandleCopyToClipboard() {
     if (outputText) {
-      navigator.clipboard.writeText(outputText).catch((error) => {
-        console.error("Failed to copy: ", error)
-      })
+      const textarea = document.createElement("textarea")
+      textarea.value = outputText
+      document.body.appendChild(textarea)
+      textarea.select()
+      textarea.setSelectionRange(0, 9999)
+
+      document.execCommand("copy")
+      document.body.removeChild(textarea)
     }
   }
 
@@ -117,25 +122,7 @@ export default function BlockTranslator({
   }, [inputText, outputText])
 
   useEffect(() => {
-    const handleResize = () => {
-      document.body.style.overflow = "auto"
-      document.body.style.zoom = "100%"
-    }
-
-    const handleKeyboardOpen = () => {
-      window.scrollTo(0, document.body.scrollHeight)
-    }
-
-    window.addEventListener("resize", handleResize)
-    window.addEventListener("focusin", handleKeyboardOpen)
-
     document.body.style.touchAction = "pan-y"
-
-    return () => {
-      window.removeEventListener("resize", handleResize)
-      window.removeEventListener("focusin", handleKeyboardOpen)
-      document.body.style.touchAction = ""
-    }
   }, [])
 
   return (
@@ -147,10 +134,10 @@ export default function BlockTranslator({
             value={inputLanguage}
             onValueChange={setInputLanguage}
           >
-            <SelectTrigger className="w-[160px] border-none bg-transparent transition-colors hover:bg-black/5">
+            <SelectTrigger className="hover:bg-black/ w-[160px] border-none bg-transparent font-semibold transition-colors">
               <SelectValue placeholder="Select language" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="font-semibold">
               <SelectGroup>
                 <SelectItem key="auto" value="auto">
                   Auto-Detection
@@ -181,10 +168,10 @@ export default function BlockTranslator({
             value={outputLanguage}
             onValueChange={setOutputLanguage}
           >
-            <SelectTrigger className="w-[160px] border-none bg-transparent transition-colors hover:bg-black/5">
+            <SelectTrigger className="w-[160px] border-none bg-transparent font-semibold transition-colors hover:bg-black/5">
               <SelectValue placeholder="Select language" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="font-semibold">
               <SelectGroup>
                 {Object.entries(languagesData.translation).map(
                   ([code, language]) => (
