@@ -9,8 +9,7 @@ const isProtectedPath = (path: string): boolean => {
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  // TODO: Uncomment this when we have a proper authentication system
-  // const hasVisited = request.cookies.get("hasVisited")
+  const hasVisited = request.cookies.get("hasVisited")
   const authToken = request.cookies.get("authToken")
 
   if (isProtectedPath(pathname)) {
@@ -21,24 +20,24 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // if (
-  //   hasVisited &&
-  //   !pathname.startsWith("/translator") &&
-  //   !isProtectedPath(pathname)
-  // ) {
-  //   return NextResponse.redirect(new URL("/translator", request.url))
-  // }
+  if (
+    hasVisited &&
+    (pathname === "/" || !pathname.startsWith("/translator")) &&
+    !isProtectedPath(pathname)
+  ) {
+    return NextResponse.redirect(new URL("/translator", request.url))
+  }
 
   const response = NextResponse.next()
 
-  // if (!hasVisited) {
-  //   response.cookies.set("hasVisited", "true", {
-  //     maxAge: 30 * 24 * 60 * 60,
-  //     path: "/",
-  //     secure: process.env.NODE_ENV === "production",
-  //     sameSite: "lax"
-  //   })
-  // }
+  if (!hasVisited && pathname === "/translator") {
+    response.cookies.set("hasVisited", "true", {
+      maxAge: 30 * 24 * 60 * 60,
+      path: "/",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax"
+    })
+  }
 
   return response
 }

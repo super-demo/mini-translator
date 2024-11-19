@@ -9,7 +9,7 @@ import {
   Headphones,
   Zap
 } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import Container from "@/components/container"
 import { Button } from "@/components/ui/button"
@@ -24,7 +24,7 @@ interface OnboardingStep {
 
 export default function Page() {
   const [currentStep, setCurrentStep] = useState(0)
-  const transition = { duration: 12, yoyo: Infinity, ease: "easeInOut" }
+  const transition = { duration: 32, yoyo: Infinity, ease: "easeInOut" }
 
   const steps: OnboardingStep[] = [
     {
@@ -35,11 +35,11 @@ export default function Page() {
         "Break language barriers instantly! Our translator app provides real-time translations for text, voice, and even images. Connect with people around the world effortlessly."
     },
     {
-      title: "Multiple Input Methods",
+      title: "Multiple Input",
       description: "Type, speak, or capture",
       icon: <Zap className="h-12 w-12 text-primary" />,
       content:
-        "Choose your preferred input method. Type text, use voice recognition for speech-to-text, or snap a photo of text to translate. Our app adapts to your needs, making translation a breeze."
+        "Choose your preferred input method. Type text, use voice recognition for speech-to-text, or of text to translate. Our app adapts to your needs, making translation a breeze."
     },
     {
       title: "Offline Capabilities",
@@ -71,8 +71,15 @@ export default function Page() {
     }
   }
 
+  useEffect(() => {
+    document.body.style.touchAction = "none"
+
+    // make browser on laptop/desktop not scrollable
+    document.body.style.overflow = "hidden"
+  }, [])
+
   return (
-    <Container className="min-h-screen flex-col items-center justify-center bg-cover bg-center p-4">
+    <Container className="flex-col items-center justify-center bg-cover bg-center p-4 pt-8">
       <div className="relative bg-background/80 backdrop-blur-md">
         <div className="absolute inset-0">
           <svg xmlns="http://www.w3.org/2000/svg" width="451" height="437">
@@ -99,113 +106,115 @@ export default function Page() {
           />
         </div>
       </div>
-      <Card className="relative z-10 w-full max-w-3xl bg-background/80 backdrop-blur-md">
-        <CardContent className="p-6">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="mb-8 flex items-center justify-between">
-                <div className="space-y-1">
-                  <h2 className="text-2xl font-bold">
-                    {steps[currentStep].title}
-                  </h2>
-                  <p className="text-muted-foreground">
-                    {steps[currentStep].description}
-                  </p>
+      <div className="pt-12">
+        <Card className="relative z-10 w-full max-w-3xl bg-background/80 backdrop-blur-md">
+          <CardContent className="p-6">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="mb-8 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h2 className="text-2xl font-bold">
+                      {steps[currentStep].title}
+                    </h2>
+                    <p className="text-muted-foreground">
+                      {steps[currentStep].description}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {steps.map((_, index) => (
+                      <motion.div
+                        key={index}
+                        className={`h-2 w-2 rounded-full ${
+                          index === currentStep
+                            ? "bg-primary"
+                            : "bg-muted-foreground/20"
+                        }`}
+                        animate={{
+                          scale: index === currentStep ? 1.5 : 1
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 20
+                        }}
+                      />
+                    ))}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {steps.map((_, index) => (
-                    <motion.div
-                      key={index}
-                      className={`h-2 w-2 rounded-full ${
-                        index === currentStep
-                          ? "bg-primary"
-                          : "bg-muted-foreground/20"
-                      }`}
-                      animate={{
-                        scale: index === currentStep ? 1.5 : 1
-                      }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 20
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
 
-              <div className="mb-8 flex flex-col items-center gap-8 md:flex-row">
-                <motion.div
-                  className="flex h-32 w-32 flex-shrink-0 items-center justify-center rounded-full bg-primary/10"
-                  initial={{ rotate: -180, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {steps[currentStep].icon}
-                </motion.div>
-                <div className="flex-1 text-center md:text-left">
-                  <p className="text-lg leading-relaxed">
-                    {steps[currentStep].content}
-                  </p>
+                <div className="mb-8 flex flex-col items-center gap-8 md:flex-row">
+                  <motion.div
+                    className="flex h-32 w-32 flex-shrink-0 items-center justify-center rounded-full bg-primary/10"
+                    initial={{ rotate: -180, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {steps[currentStep].icon}
+                  </motion.div>
+                  <div className="flex-1 text-center md:text-left">
+                    <p className="text-lg leading-relaxed">
+                      {steps[currentStep].content}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+              </motion.div>
+            </AnimatePresence>
 
-          <div className="flex items-center justify-between">
-            <Button
-              variant="outline"
-              onClick={handlePrevious}
-              disabled={currentStep === 0}
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Previous
-            </Button>
-            <div className="text-sm text-muted-foreground">
-              Step {currentStep + 1} of {steps.length}
+            <div className="flex items-center justify-between">
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={currentStep === 0}
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Previous
+              </Button>
+              <div className="text-sm text-muted-foreground">
+                Step {currentStep + 1} of {steps.length}
+              </div>
+              <Button onClick={handleNext} className="gap-2">
+                {currentStep === steps.length - 1 ? "Let's go" : "Next"}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
             </div>
-            <Button onClick={handleNext} className="gap-2">
-              {currentStep === steps.length - 1 ? "Let's go" : "Next"}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      <div>
-        <footer className="py-6 md:px-8 md:py-0">
-          <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-            <p className="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
-              This app is{" "}
-              <a
-                href={"https://github.com/super-demo/mini-translator"}
-                target="_blank"
-                rel="noreferrer"
-                className="font-medium underline underline-offset-4"
-              >
-                Mini - Translator
-              </a>
-              . This exquisite work of code is readily accessible for
-              exploration on{" "}
-              <a
-                href={"https://github.com/super-demo"}
-                target="_blank"
-                rel="noreferrer"
-                className="font-medium underline underline-offset-4"
-              >
-                GitHub
-              </a>
-              .
-            </p>
-          </div>
-        </footer>
+        <div>
+          <footer className="py-6 md:px-8 md:py-0">
+            <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+              <p className="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
+                This app is{" "}
+                <a
+                  href={"https://github.com/super-demo/mini-translator"}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium underline underline-offset-4"
+                >
+                  Mini - Translator
+                </a>
+                {/* . This exquisite work of code is readily accessible for
+                exploration on{" "}
+                <a
+                  href={"https://github.com/super-demo"}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium underline underline-offset-4"
+                >
+                  GitHub
+                </a>
+                . */}
+              </p>
+            </div>
+          </footer>
+        </div>
       </div>
     </Container>
   )
