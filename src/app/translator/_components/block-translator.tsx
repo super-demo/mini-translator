@@ -1,7 +1,7 @@
 "use client"
 
-import { ArrowUpDown, Download, Upload } from "lucide-react"
-import { useCallback, useEffect, useState } from "react"
+import { ArrowUpDown, Copy, Mic, Play, Star, Upload } from "lucide-react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { GetTranslateText } from "@/api/translator/actions"
 import { TranslateLanguagesResponse } from "@/api/translator/types"
@@ -11,7 +11,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
@@ -21,11 +20,15 @@ interface BlockTranslatorProps {
   languagesData: TranslateLanguagesResponse
 }
 
-export default function BlockTranslator(props: BlockTranslatorProps) {
+export default function BlockTranslator({
+  languagesData
+}: BlockTranslatorProps) {
   const [inputText, setInputText] = useState<string>("")
   const [outputText, setOutputText] = useState<string>("")
   const [inputLanguage, setInputLanguage] = useState<string>("auto")
   const [outputLanguage, setOutputLanguage] = useState<string>("th")
+  const inputTextareaRef = useRef<HTMLTextAreaElement>(null)
+  const outputTextareaRef = useRef<HTMLTextAreaElement>(null)
 
   const HandleTranslate = useCallback(async () => {
     if (!inputText) return
@@ -81,16 +84,17 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
     reader.readAsText(file)
   }
 
-  function HandleDownload() {
-    if (!outputText) return
+  function HandleCopyToClipboard() {
+    if (outputText) {
+      const textarea = document.createElement("textarea")
+      textarea.value = outputText
+      document.body.appendChild(textarea)
+      textarea.select()
+      textarea.setSelectionRange(0, 9999)
 
-    const blob = new Blob([outputText], { type: "text/plain" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `translated-to-${outputLanguage}.txt`
-    a.click()
-    URL.revokeObjectURL(url)
+      document.execCommand("copy")
+      document.body.removeChild(textarea)
+    }
   }
 
   useEffect(() => {
@@ -103,31 +107,42 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
     return () => clearTimeout(debounce)
   }, [inputText, HandleTranslate])
 
+  useEffect(() => {
+    if (!inputText) setOutputText("")
+
+    const resizeTextarea = (textarea: HTMLTextAreaElement | null) => {
+      if (textarea) {
+        textarea.style.height = "auto"
+        textarea.style.height = `${textarea.scrollHeight}px`
+      }
+    }
+
+    resizeTextarea(inputTextareaRef.current)
+    resizeTextarea(outputTextareaRef.current)
+  }, [inputText, outputText])
+
+  useEffect(() => {
+    document.body.style.touchAction = "pan-y"
+  }, [])
+
   return (
-    <div className="max-h-screen">
-      <div className="">
-        <div>
+    <div className="mx-auto w-full space-y-4">
+      <div className="rounded-2xl border bg-white/80 shadow-sm backdrop-blur-xl">
+        <div className="flex items-center justify-between border-b p-3">
           <Select
             name="input-language"
             value={inputLanguage}
             onValueChange={setInputLanguage}
           >
-            <SelectTrigger className="w-[280px]">
-              <SelectValue placeholder="Select a language" />
+            <SelectTrigger className="hover:bg-black/ w-[160px] border-none bg-transparent font-semibold transition-colors">
+              <SelectValue placeholder="Select language" />
             </SelectTrigger>
-
-            <SelectContent>
+            <SelectContent className="font-semibold">
               <SelectGroup>
-                <SelectLabel>Want us to figure it out?</SelectLabel>
                 <SelectItem key="auto" value="auto">
                   Auto-Detection
                 </SelectItem>
-              </SelectGroup>
-
-              <SelectGroup>
-                <SelectLabel>Languages</SelectLabel>
-
-                {Object.entries(props.languagesData.translation).map(
+                {Object.entries(languagesData.translation).map(
                   ([code, language]) => (
                     <SelectItem key={code} value={code}>
                       {language.name}
@@ -138,66 +153,27 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
             </SelectContent>
           </Select>
 
-          <Textarea
-            name="input-text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value.slice(0, 5000))}
-            placeholder="Enter text to translate..."
-          />
-          <div className="mt-4 flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">
-              {inputText.length} / 5000
-            </span>
-            <div className="flex gap-2">
-              <input
-                type="file"
-                id="file-upload"
-                className="hidden"
-                onChange={HandleFileUpload}
-                accept=".txt,.pdf,.doc,.docx"
-              />
-              <Button
-                variant="outline"
-                onClick={() => {
-                  const fileInput = document.getElementById(
-                    "file-upload"
-                  ) as HTMLInputElement
-                  fileInput?.click()
-                }}
-              >
-                <Upload className="mr-2 h-4 w-4" />
-                Upload File
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <div>
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             onClick={HandleSwapLanguages}
             disabled={inputLanguage === "auto"}
+            className="rounded-full hover:bg-black/5"
           >
             <ArrowUpDown className="h-4 w-4" />
           </Button>
-        </div>
 
-        <div>
           <Select
             name="output-language"
             value={outputLanguage}
             onValueChange={setOutputLanguage}
           >
-            <SelectTrigger className="w-[280px]">
-              <SelectValue placeholder="Select a language" />
+            <SelectTrigger className="w-[160px] border-none bg-transparent font-semibold transition-colors hover:bg-black/5">
+              <SelectValue placeholder="Select language" />
             </SelectTrigger>
-
-            <SelectContent>
+            <SelectContent className="font-semibold">
               <SelectGroup>
-                <SelectLabel>Languages</SelectLabel>
-
-                {Object.entries(props.languagesData.translation).map(
+                {Object.entries(languagesData.translation).map(
                   ([code, language]) => (
                     <SelectItem key={code} value={code}>
                       {language.name}
@@ -207,23 +183,95 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
               </SelectGroup>
             </SelectContent>
           </Select>
+        </div>
 
-          <Textarea
-            readOnly
-            name="output-text"
-            value={outputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="Translation will appear here..."
-          />
-          <div className="mt-4 flex justify-end">
-            <Button
-              variant="outline"
-              onClick={HandleDownload}
-              disabled={!outputText}
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Download
-            </Button>
+        <div className="border-b p-4">
+          <div className="relative">
+            <Textarea
+              ref={inputTextareaRef}
+              name="input-text"
+              value={inputText}
+              onChange={(e) => {
+                setInputText(e.target.value)
+              }}
+              onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                }
+              }}
+              placeholder="Enter text"
+              className="min-h-[80px] resize-none border-none bg-transparent p-0 text-lg"
+              style={{ overflow: "hidden" }}
+            />
+            <div className="mt-2 flex items-center justify-between">
+              <div className="text-xs text-muted-foreground">
+                {inputText.length} / 5000
+              </div>
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-full hover:bg-black/5"
+                >
+                  <Mic className="h-4 w-4" />
+                </Button>
+                <input
+                  type="file"
+                  id="file-upload"
+                  className="hidden"
+                  onChange={HandleFileUpload}
+                  accept=".txt,.pdf,.doc,.docx"
+                />
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-full hover:bg-black/5"
+                  onClick={() =>
+                    document.getElementById("file-upload")?.click()
+                  }
+                >
+                  <Upload className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4">
+          <div className="relative">
+            <Textarea
+              ref={outputTextareaRef}
+              readOnly
+              name="output-text"
+              value={outputText}
+              placeholder="Translation"
+              className="min-h-[60px] resize-none border-none bg-transparent p-0 text-lg focus:ring-0"
+              style={{ overflow: "hidden" }}
+            />
+            <div className="mt-2 flex justify-end gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="rounded-full hover:bg-black/5"
+              >
+                <Play className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="rounded-full hover:bg-black/5"
+                onClick={HandleCopyToClipboard}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="rounded-full hover:bg-black/5"
+              >
+                <Star className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
