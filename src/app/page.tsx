@@ -1,7 +1,5 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { AnimatePresence, motion } from "framer-motion"
 import {
   ArrowLeft,
@@ -13,7 +11,9 @@ import {
 } from "lucide-react"
 import { useState } from "react"
 
-import Container from "../components/container"
+import Container from "@/components/container"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface OnboardingStep {
   title: string
