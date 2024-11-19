@@ -7,20 +7,20 @@ interface HeaderContextType {
   setIsInteresting: (value: boolean) => void
 }
 
-const HeaderContext = createContext<HeaderContextType | undefined>(undefined)
+const SiteContext = createContext<HeaderContextType | undefined>(undefined)
 
-export function HeaderProvider({ children }: { children: ReactNode }) {
+export function SiteProvider({ children }: { children: ReactNode }) {
   const [isInteresting, setIsInteresting] = useState(false)
 
   return (
-    <HeaderContext.Provider value={{ isInteresting, setIsInteresting }}>
+    <SiteContext.Provider value={{ isInteresting, setIsInteresting }}>
       {children}
-    </HeaderContext.Provider>
+    </SiteContext.Provider>
   )
 }
 
 export function UseHeader() {
-  const context = useContext(HeaderContext)
+  const context = useContext(SiteContext)
   if (!context) {
     throw new Error("UseHeader must be used within a HeaderProvider")
   }

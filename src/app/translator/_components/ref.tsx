@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 
-import { UseHeader } from "@/hooks/use-header"
+import { UseHeader } from "@/hooks/site-provider"
 import UseOnScreen from "@/hooks/use-onscreen"
 
 export function Ref() {

@@ -3,8 +3,7 @@ import localFont from "next/font/local"
 
 import Header from "@/components/header"
 import { ThemeProvider } from "@/components/theme-provider"
-
-import { HeaderProvider } from "../hooks/use-header"
+import { SiteProvider } from "@/hooks/site-provider"
 import "./globals.css"
 
 const geistSans = localFont({
@@ -39,10 +38,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <HeaderProvider>
+          <SiteProvider>
             <Header />
             {children}
-          </HeaderProvider>
+          </SiteProvider>
         </ThemeProvider>
       </body>
     </html>

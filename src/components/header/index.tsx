@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation"
 
 import { MenuDropdown } from "@/components/header/menu-dropdown"
-import { UseHeader } from "@/hooks/use-header"
+import { UseHeader } from "@/hooks/site-provider"
 
 export default function Header() {
   const { isInteresting } = UseHeader()
