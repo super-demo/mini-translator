@@ -2,6 +2,7 @@
 
 import { CircleEllipsis } from "lucide-react"
 
+import { ThemeSwitch } from "@/components/header/theme-swtich"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,8 +23,12 @@ export function MenuDropdown() {
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel>Options</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Theme</DropdownMenuItem>
-        <DropdownMenuItem>Settings</DropdownMenuItem>
+        <DropdownMenuLabel>
+          <ThemeSwitch />
+        </DropdownMenuLabel>
+        <DropdownMenuItem>
+          <p className="text-gray-300 dark:text-gray-600">Settings</p>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

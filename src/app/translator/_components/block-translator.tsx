@@ -28,6 +28,7 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
   const [outputLanguage, setOutputLanguage] = useState<string>("th")
   const inputTextareaRef = useRef<HTMLTextAreaElement>(null)
   const outputTextareaRef = useRef<HTMLTextAreaElement>(null)
+  const [isStarred, setIsStarred] = useState<boolean>(false)
 
   const HandleTranslate = useCallback(async () => {
     if (!inputText) return
@@ -96,6 +97,10 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
     }
   }
 
+  function HandleToggleStar() {
+    setIsStarred((prev) => !prev)
+  }
+
   useEffect(() => {
     const debounce = setTimeout(() => {
       if (inputText) {
@@ -122,11 +127,28 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
 
   useEffect(() => {
     document.body.style.touchAction = "pan-y"
+
+    const handleBlur = (e: FocusEvent) => {
+      if (["INPUT", "TEXTAREA"].includes((e.target as HTMLElement).tagName)) {
+        setTimeout(
+          () =>
+            window.scrollTo({
+              top: 10,
+              behavior: "smooth"
+            }),
+          100
+        )
+      }
+    }
+
+    document.addEventListener("blur", handleBlur, true)
+
+    return () => document.removeEventListener("blur", handleBlur, true)
   }, [])
 
   return (
     <div className="mx-auto w-full space-y-4">
-      <div className="rounded-2xl border bg-white/80 shadow-sm backdrop-blur-xl">
+      <div className="rounded-2xl border shadow-sm backdrop-blur-xl">
         <div className="flex items-center justify-between border-b p-3">
           <Select
             name="input-language"
@@ -255,6 +277,7 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
             />
             <div className="mt-2 flex justify-end gap-2">
               <Button
+                disabled
                 size="sm"
                 variant="ghost"
                 className="rounded-full hover:bg-black/5"
@@ -270,11 +293,16 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
                 <Copy className="h-4 w-4" />
               </Button>
               <Button
+                disabled
                 size="sm"
                 variant="ghost"
                 className="rounded-full hover:bg-black/5"
+                onClick={HandleToggleStar}
               >
-                <Star className="h-4 w-4" />
+                <Star
+                  className="h-4 w-4"
+                  fill={isStarred ? "currentColor" : "none"}
+                />
               </Button>
             </div>
           </div>
