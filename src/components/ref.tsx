@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 
-import { UseContext } from "@/hooks/use-context"
+import { UseRefContext } from "@/hooks/use-context"
 import UseOnScreen from "@/hooks/use-onscreen"
 
 interface RefProps {
@@ -16,7 +16,7 @@ export function Ref(props: RefProps) {
     threshold: props.thereshold || 0
   })
 
-  const { setIsInteresting } = UseContext()
+  const { setIsInteresting } = UseRefContext()
 
   useEffect(() => {
     setIsInteresting(!isInteresting)
