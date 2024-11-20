@@ -2,12 +2,13 @@
 
 import { createContext, ReactNode, useContext, useState } from "react"
 
-interface HeaderContextType {
+// Combined context type for both Header and Footer
+interface SiteContextType {
   isInteresting: boolean
   setIsInteresting: (value: boolean) => void
 }
 
-const SiteContext = createContext<HeaderContextType | undefined>(undefined)
+const SiteContext = createContext<SiteContextType | undefined>(undefined)
 
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [isInteresting, setIsInteresting] = useState(false)
@@ -19,10 +20,10 @@ export function SiteProvider({ children }: { children: ReactNode }) {
   )
 }
 
-export function UseHeader() {
+export function UseContext() {
   const context = useContext(SiteContext)
   if (!context) {
-    throw new Error("UseHeader must be used within a HeaderProvider")
+    throw new Error("UseContext must be used within a SiteProvider")
   }
   return context
 }
