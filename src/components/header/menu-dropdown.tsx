@@ -12,7 +12,11 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 
+import { UseAuthContext } from "@/hooks/use-context"
+
 export function MenuDropdown() {
+  const { SignOut } = UseAuthContext()
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,6 +32,9 @@ export function MenuDropdown() {
         </DropdownMenuLabel>
         <DropdownMenuItem>
           <p className="text-gray-300 dark:text-gray-600">Settings</p>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={SignOut}>
+          <p>Sign out</p>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

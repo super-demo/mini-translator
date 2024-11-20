@@ -7,17 +7,15 @@ const isProtectedPath = (path: string): boolean => {
   return PROTECTED_PATHS.some((protectedPath) => path.startsWith(protectedPath))
 }
 
-export function middleware(request: NextRequest) {
+export default function Middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   // const hasVisited = request.cookies.get("hasVisited")
-  const authToken = request.cookies.get("authToken")
+  const authToken = request.cookies.get("auth-token")
 
-  if (isProtectedPath(pathname)) {
-    if (!authToken) {
-      const authentication = new URL("/authentication", request.url)
-      authentication.searchParams.set("callbackUrl", pathname)
-      return NextResponse.redirect(authentication)
-    }
+  if (!authToken && isProtectedPath(pathname)) {
+    const authentication = new URL("/authentication", request.url)
+    authentication.searchParams.set("callbackUrl", pathname)
+    return NextResponse.redirect(authentication)
   }
 
   // if (
@@ -43,7 +41,7 @@ export function middleware(request: NextRequest) {
 }
 
 // Configure middleware matching paths
-export const config = {
+export const configPath = {
   matcher: [
     /*
      * Match all paths except:
