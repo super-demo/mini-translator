@@ -3,10 +3,10 @@
 import { usePathname } from "next/navigation"
 
 import { MenuDropdown } from "@/components/header/menu-dropdown"
-import { UseHeader } from "@/hooks/site-provider"
+import { UseContext } from "@/hooks/use-context"
 
 export default function Header() {
-  const { isInteresting } = UseHeader()
+  const { isInteresting } = UseContext()
   const pathname =
     usePathname().split("/")[1]?.charAt(0).toUpperCase() +
       usePathname().split("/")[1]?.slice(1) || ""
