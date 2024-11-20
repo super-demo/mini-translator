@@ -114,8 +114,8 @@ export default function AuthOptions(): NextAuthOptions {
     },
 
     pages: {
-      signIn: "/sign-in",
-      error: "/sign-in"
+      signIn: "/authentication",
+      error: "/authentication"
     }
   }
 }
