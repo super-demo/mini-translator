@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
 
-const PROTECTED_PATHS = ["/profile", "/favorite"]
+const PROTECTED_PATHS = ["/conversation", "/profile", "/favorite"]
 
 const isProtectedPath = (path: string): boolean => {
   return PROTECTED_PATHS.some((protectedPath) => path.startsWith(protectedPath))
@@ -9,35 +9,35 @@ const isProtectedPath = (path: string): boolean => {
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const hasVisited = request.cookies.get("hasVisited")
+  // const hasVisited = request.cookies.get("hasVisited")
   const authToken = request.cookies.get("authToken")
 
   if (isProtectedPath(pathname)) {
     if (!authToken) {
-      const signInURL = new URL("/sign-in", request.url)
-      signInURL.searchParams.set("callbackUrl", pathname)
-      return NextResponse.redirect(signInURL)
+      const authentication = new URL("/authentication", request.url)
+      authentication.searchParams.set("callbackUrl", pathname)
+      return NextResponse.redirect(authentication)
     }
   }
 
-  if (
-    hasVisited &&
-    (pathname === "/" || !pathname.startsWith("/translator")) &&
-    !isProtectedPath(pathname)
-  ) {
-    return NextResponse.redirect(new URL("/translator", request.url))
-  }
+  // if (
+  //   hasVisited &&
+  //   (pathname === "/" || !pathname.startsWith("/translator")) &&
+  //   !isProtectedPath(pathname)
+  // ) {
+  //   return NextResponse.redirect(new URL("/translator", request.url))
+  // }
 
   const response = NextResponse.next()
 
-  if (!hasVisited && pathname === "/translator") {
-    response.cookies.set("hasVisited", "true", {
-      maxAge: 30 * 24 * 60 * 60,
-      path: "/",
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax"
-    })
-  }
+  // if (!hasVisited && pathname === "/translator") {
+  //   response.cookies.set("hasVisited", "true", {
+  //     maxAge: 30 * 24 * 60 * 60,
+  //     path: "/",
+  //     secure: process.env.NODE_ENV === "production",
+  //     sameSite: "lax"
+  //   })
+  // }
 
   return response
 }

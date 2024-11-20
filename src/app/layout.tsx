@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
 import localFont from "next/font/local"
 
+import Footer from "@/components/footer"
 import Header from "@/components/header"
 import { ThemeProvider } from "@/components/theme-provider"
-import { SiteProvider } from "@/hooks/site-provider"
+import { SiteProvider } from "@/hooks/use-context"
 import "./globals.css"
 
 const geistSans = localFont({
@@ -41,6 +42,7 @@ export default function RootLayout({
           <SiteProvider>
             <Header />
             {children}
+            <Footer />
           </SiteProvider>
         </ThemeProvider>
       </body>
