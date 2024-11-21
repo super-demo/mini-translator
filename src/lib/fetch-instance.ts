@@ -8,7 +8,7 @@
 
 import { getServerSession } from "next-auth"
 
-import AuthOptions from "@/api/auth/[...nextauth]/auth-options"
+import AuthOptions from "@/app/api/auth/[...nextauth]/auth-options"
 import config from "@/config"
 
 interface FetechInstanceProps {

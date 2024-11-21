@@ -3,7 +3,7 @@
 import {
   GetTranslateTextProps,
   TranslateLanguagesResponse
-} from "@/api/translator/types"
+} from "@/app/api/translator/types"
 import config from "@/config"
 import HttpError from "@/lib/http-error"
 

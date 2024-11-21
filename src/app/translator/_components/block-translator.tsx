@@ -3,8 +3,8 @@
 import { ArrowUpDown, Copy, Play, Star, Upload } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import { GetTranslateText } from "@/api/translator/actions"
-import { TranslateLanguagesResponse } from "@/api/translator/types"
+import { GetTranslateText } from "@/app/api/translator/actions"
+import { TranslateLanguagesResponse } from "@/app/api/translator/types"
 import { TranslatorMicrophone } from "@/app/translator/_components/microphone-translator"
 import { Button } from "@/components/ui/button"
 import {

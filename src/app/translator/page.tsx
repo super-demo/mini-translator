@@ -1,4 +1,4 @@
-import { GetTranslateLanguages } from "@/api/translator/actions"
+import { GetTranslateLanguages } from "@/app/api/translator/actions"
 import BlockTranslator from "@/app/translator/_components/block-translator"
 import Container from "@/components/container"
 import { Ref } from "@/components/ref"

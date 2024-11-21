@@ -15,6 +15,7 @@ import { UseAuthContext } from "@/hooks/use-context"
 
 export function MenuDropdown() {
   const { SignOut } = UseAuthContext()
+  const auth = UseAuthContext()
 
   return (
     <DropdownMenu>
@@ -32,9 +33,11 @@ export function MenuDropdown() {
         <DropdownMenuItem>
           <p className="text-gray-300 dark:text-gray-600">Settings</p>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={SignOut}>
-          <p>Sign out</p>
-        </DropdownMenuItem>
+        {auth?.currentUser && (
+          <DropdownMenuItem onClick={SignOut}>
+            <p>Sign out</p>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

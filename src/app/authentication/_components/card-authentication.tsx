@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { UseAuthContext } from "@/hooks/use-context"
 
 export default function CardAuthentication() {
-  const { GoogleSignIn } = UseAuthContext()
+  const { SignInWithGoogle } = UseAuthContext()
 
   const [usersname, setUsername] = useState<string>("")
   const [email, setEmail] = useState<string>("")
@@ -20,15 +20,17 @@ export default function CardAuthentication() {
 
   async function HandleGoogleSignIn() {
     try {
-      await GoogleSignIn()
+      await SignInWithGoogle()
     } catch (error) {
       console.error("Google sign in error:", error)
     }
   }
+
   function HandleSignIn(e: FormEvent) {
     e.preventDefault()
     console.log("Sign in attempted with:", email, password)
   }
+
   function HandleSignUp(e: FormEvent) {
     e.preventDefault()
     console.log("Sign up attempted with:", usersname, email, password)
