@@ -4,7 +4,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
-  UserInfo
+  User
 } from "firebase/auth"
 import {
   createContext,
@@ -13,6 +13,7 @@ import {
   useEffect,
   useState
 } from "react"
+import { SessionProvider } from "next-auth/react"
 
 import { auth } from "@/config/firebase"
 
@@ -21,9 +22,9 @@ interface SiteContextType {
 }
 
 interface AuthContextType {
-  user: UserInfo | null | undefined
-  setUser: (value: UserInfo | null | undefined) => void
-  GoogleSignIn: () => void
+  currentUser: User | null
+  setCurrentUser: (user: User | null) => void
+  SignInWithGoogle: () => void
   SignOut: () => void
 }
 
@@ -37,11 +38,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 const RefContext = createContext<RefContextType | undefined>(undefined)
 
 export function SiteProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserInfo | null | undefined>()
   const [isInteresting, setIsInteresting] = useState(false)
-  const root = { user, setUser, isInteresting, setIsInteresting }
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
+  const root = { isInteresting, setIsInteresting }
 
-  async function GoogleSignIn() {
+  async function SignInWithGoogle() {
     try {
       const provider = new GoogleAuthProvider()
       await signInWithPopup(auth, provider)
@@ -61,25 +62,28 @@ export function SiteProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    if (!auth) return
+
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUser(user)
-      } else {
-        setUser(null)
-      }
+      if (user) setCurrentUser(user)
+      else if (!user) setCurrentUser(null)
     })
 
-    return () => unsubscribe()
-  }, [user])
+    return unsubscribe
+  }, [])
 
   return (
-    <SiteContext.Provider value={{ root }}>
-      <AuthContext.Provider value={{ user, setUser, GoogleSignIn, SignOut }}>
-        <RefContext.Provider value={{ isInteresting, setIsInteresting }}>
-          {children}
-        </RefContext.Provider>
-      </AuthContext.Provider>
-    </SiteContext.Provider>
+    <SessionProvider>
+      <SiteContext.Provider value={{ root }}>
+        <AuthContext.Provider
+          value={{ currentUser, setCurrentUser, SignInWithGoogle, SignOut }}
+        >
+          <RefContext.Provider value={{ isInteresting, setIsInteresting }}>
+            {children}
+          </RefContext.Provider>
+        </AuthContext.Provider>
+      </SiteContext.Provider>
+    </SessionProvider>
   )
 }
 
