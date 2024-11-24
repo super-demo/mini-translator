@@ -1,47 +1,27 @@
 import { NextRequest, NextResponse } from "next/server"
 
-// const PROTECTED_PATHS = ["/conversation", "/profile", "/favorite"]
-
-// const isProtectedPath = (path: string): boolean =>
-//   PROTECTED_PATHS.some((protectedPath) => path.startsWith(protectedPath))
-
-// import config from "@/config"
-// import { withAuth } from "next-auth/middleware"
-// import { NextRequest, NextResponse } from "next/server"
-
-// export default withAuth(
-//   function middleware(req: NextRequest) {
-//     if (req.nextUrl.pathname === "/") {
-//       return NextResponse.redirect(new URL("/app", req.url))
-//     }
-//     return NextResponse.next()
-//   },
-//   {
-//     secret: config.authSecret,
-//     pages: {
-//       signIn: "/authentication"
-//     }
-//   }
-// )
+import {
+  AUTHENTICATION_ROUTE,
+  PROTECTED_ROUTES,
+  ROOT_ROUTE,
+  TRANSLATOR_ROUTE
+} from "@/constants/routes"
+import { USER_SESSION, VISTED_SESSION } from "@/constants/utils"
 
 export default function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  const hasVisited = request.cookies.get("hasVisited")
-  const response = NextResponse.next()
+  const { pathname, origin } = request.nextUrl
+  const user = request.cookies.get(USER_SESSION)
+  const visited = request.cookies.get(VISTED_SESSION)
 
-  if (hasVisited && (pathname === "/" || !pathname.startsWith("/translator")))
-    NextResponse.redirect(new URL("/translator", request.url))
-
-  if (!hasVisited && pathname === "/translator") {
-    response.cookies.set("hasVisited", "true", {
-      maxAge: 30 * 24 * 60 * 60,
-      path: "/",
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax"
-    })
+  if (visited && pathname === ROOT_ROUTE) {
+    const absoluteURL = new URL(TRANSLATOR_ROUTE, origin)
+    return NextResponse.redirect(absoluteURL.toString())
   }
 
-  return response
+  if (!user && PROTECTED_ROUTES.includes(pathname)) {
+    const absoluteURL = new URL(AUTHENTICATION_ROUTE, origin)
+    return NextResponse.redirect(absoluteURL.toString())
+  }
 }
 
 // Configure middleware matching paths

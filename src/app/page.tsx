@@ -9,12 +9,16 @@ import {
   Headphones,
   Zap
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import AlongPath from "@/components/background/along-path"
 import Container from "@/components/container"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { TRANSLATOR_ROUTE } from "@/constants/routes"
+
+import { CreateVisitedSession } from "./api/auth/actions"
 
 interface OnboardingStep {
   title: string
@@ -25,6 +29,7 @@ interface OnboardingStep {
 
 export default function Page() {
   const [currentStep, setCurrentStep] = useState<number>(0)
+  const router = useRouter()
 
   const steps: OnboardingStep[] = [
     {
@@ -54,18 +59,17 @@ export default function Page() {
     }
   ]
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1)
     } else {
-      window.location.href = "/translator"
+      await CreateVisitedSession({ check: "true" })
+      router.push(TRANSLATOR_ROUTE)
     }
   }
 
   const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1)
-    }
+    if (currentStep > 0) setCurrentStep(currentStep - 1)
   }
 
   useEffect(() => {

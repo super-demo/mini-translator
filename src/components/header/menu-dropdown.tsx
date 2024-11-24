@@ -2,6 +2,7 @@
 
 import { CircleEllipsis } from "lucide-react"
 
+import { RemoveUserSession } from "@/app/api/auth/actions"
 import { ThemeSwitch } from "@/components/header/theme-swtich"
 import {
   DropdownMenu,
@@ -11,11 +12,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
+import { AUTHENTICATION_ROUTE } from "@/constants/routes"
 import { UseAuthContext } from "@/hooks/use-context"
+import { SignOut } from "@/lib/auth"
+import { useRouter } from "next/navigation"
 
 export function MenuDropdown() {
-  const { SignOut } = UseAuthContext()
-  const auth = UseAuthContext()
+  const { currentUser } = UseAuthContext()
+  const router = useRouter()
+
+  function HandleSignOut() {
+    SignOut()
+    RemoveUserSession()
+    router.push(AUTHENTICATION_ROUTE)
+  }
 
   return (
     <DropdownMenu>
@@ -33,8 +43,8 @@ export function MenuDropdown() {
         <DropdownMenuItem>
           <p className="text-gray-300 dark:text-gray-600">Settings</p>
         </DropdownMenuItem>
-        {auth?.currentUser && (
-          <DropdownMenuItem onClick={SignOut}>
+        {currentUser && (
+          <DropdownMenuItem onClick={HandleSignOut}>
             <p>Sign out</p>
           </DropdownMenuItem>
         )}
