@@ -1,6 +1,7 @@
 "use client"
 
 import { CircleEllipsis } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import { RemoveUserSession } from "@/app/api/auth/actions"
 import { ThemeSwitch } from "@/components/header/theme-swtich"
@@ -15,7 +16,6 @@ import {
 import { AUTHENTICATION_ROUTE } from "@/constants/routes"
 import { UseAuthContext } from "@/hooks/use-context"
 import { SignOut } from "@/lib/auth"
-import { useRouter } from "next/navigation"
 
 export function MenuDropdown() {
   const { currentUser } = UseAuthContext()
