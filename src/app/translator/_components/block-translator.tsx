@@ -17,12 +17,15 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import UseKeyboard from "@/hooks/use-keyboard"
 
 interface BlockTranslatorProps {
   languagesData: TranslateLanguagesResponse
 }
 
 export default function BlockTranslator(props: BlockTranslatorProps) {
+  UseKeyboard()
+
   const [inputText, setInputText] = useState<string>("")
   const [outputText, setOutputText] = useState<string>("")
   const [inputLanguage, setInputLanguage] = useState<string>("auto")
@@ -133,27 +136,6 @@ export default function BlockTranslator(props: BlockTranslatorProps) {
     resizeTextarea(inputTextareaRef.current)
     resizeTextarea(outputTextareaRef.current)
   }, [inputText, outputText])
-
-  useEffect(() => {
-    document.body.style.touchAction = "pan-y"
-
-    const handleBlur = (e: FocusEvent) => {
-      if (["INPUT", "TEXTAREA"].includes((e.target as HTMLElement).tagName)) {
-        setTimeout(
-          () =>
-            window.scrollTo({
-              top: 10,
-              behavior: "smooth"
-            }),
-          100
-        )
-      }
-    }
-
-    document.addEventListener("blur", handleBlur, true)
-
-    return () => document.removeEventListener("blur", handleBlur, true)
-  }, [])
 
   return (
     <div className="mx-auto w-full space-y-4">

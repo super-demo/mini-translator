@@ -1,5 +1,6 @@
 "use client"
 
+import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
@@ -18,10 +19,16 @@ export default function Page() {
   }, [currentUser, router])
 
   return (
-    <Container className="flex-col gap-2">
-      <Ref rootMargin="-10px" thereshold={0.1} />
-      <p className="text-3xl font-bold">Authentication</p>
-      <CardAuthentication />
-    </Container>
+    <motion.div
+      initial={{ opacity: 0, y: 0.1 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.1 }}
+    >
+      <Container className="flex-col gap-2">
+        <Ref rootMargin="-10px" thereshold={0.1} />
+        <p className="text-3xl font-bold">Authentication</p>
+        <CardAuthentication />
+      </Container>
+    </motion.div>
   )
 }

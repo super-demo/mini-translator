@@ -1,12 +1,12 @@
 "use client"
 
 import { FormEvent, useEffect, useState } from "react"
-import {
-  useCreateUserWithEmailAndPassword,
-  useSignInWithEmailAndPassword
-} from "react-firebase-hooks/auth"
 
-import { CreateUserSession } from "@/app/api/auth/actions"
+import {
+  CreateUserSession,
+  SignInWithEmail,
+  SignUpWithEmail
+} from "@/app/api/auth/actions"
 import { GoogleButton } from "@/app/authentication/_components/google-button"
 import SignInForm from "@/app/authentication/_components/signin-form"
 import SignUpForm from "@/app/authentication/_components/signup-form"
@@ -14,47 +14,69 @@ import AlongPath from "@/components/background/along-path"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { auth } from "@/config/firebase"
+import { ACTION_FAILED_PLEASE_TRY_AGAIN } from "@/constants/errors"
+import UseKeyboard from "@/hooks/use-keyboard"
 import { SignInWithGoogle } from "@/lib/auth"
 
 export default function CardAuthentication() {
-  const [createUserWithEmailAndPassword] =
-    useCreateUserWithEmailAndPassword(auth)
-  const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth)
+  UseKeyboard()
+
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
   const [confirmPassword, setConfirmPassword] = useState<string>("")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessages, setErrorMessages] = useState<string>("")
 
   async function HandleGoogleSignIn() {
+    setIsLoading(true)
+
     try {
       const userUID = await SignInWithGoogle()
       if (userUID) CreateUserSession({ uid: userUID })
     } catch (error) {
-      console.error("Google sign in error:", error)
+      setErrorMessages(
+        error instanceof Error
+          ? error.message
+          : ACTION_FAILED_PLEASE_TRY_AGAIN("Google sign in")
+      )
+    } finally {
+      setIsLoading(false)
     }
   }
 
-  async function HandleSignIn(e: FormEvent) {
-    e.preventDefault()
+  async function HandleSignIn(event: FormEvent) {
+    event.preventDefault()
+    setIsLoading(true)
 
     try {
-      const userID = await signInWithEmailAndPassword(email, password)
-      if (userID) CreateUserSession({ uid: userID.user.uid })
+      await SignInWithEmail({ email: email, password: password })
     } catch (error) {
-      console.error("Sign in error:", error)
+      setErrorMessages(
+        error instanceof Error
+          ? error.message
+          : ACTION_FAILED_PLEASE_TRY_AGAIN("Sign in")
+      )
+    } finally {
+      setIsLoading(false)
     }
   }
 
-  async function HandleSignUp(e: FormEvent) {
-    e.preventDefault()
+  async function HandleSignUp(event: FormEvent) {
+    event.preventDefault()
+    setIsLoading(true)
 
     try {
-      const userID = await createUserWithEmailAndPassword(email, password)
-      if (userID) CreateUserSession({ uid: userID.user.uid })
+      await SignUpWithEmail({ email: email, password: password })
     } catch (error) {
-      console.error("Sign up error:", error)
+      setErrorMessages(
+        error instanceof Error
+          ? error.message
+          : ACTION_FAILED_PLEASE_TRY_AGAIN("Sign up")
+      )
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -67,25 +89,8 @@ export default function CardAuthentication() {
   }
 
   useEffect(() => {
-    document.body.style.touchAction = "pan-y"
-
-    const handleBlur = (e: FocusEvent) => {
-      if (["INPUT", "TEXTAREA"].includes((e.target as HTMLElement).tagName)) {
-        setTimeout(
-          () =>
-            window.scrollTo({
-              top: 0,
-              behavior: "smooth"
-            }),
-          100
-        )
-      }
-    }
-
-    document.addEventListener("blur", handleBlur, true)
-
-    return () => document.removeEventListener("blur", handleBlur, true)
-  }, [])
+    setErrorMessages("")
+  }, [confirmPassword, email, password])
 
   return (
     <div className="flex flex-col items-center justify-center bg-gradient-to-b from-background to-background/80 pb-12">
@@ -106,12 +111,17 @@ export default function CardAuthentication() {
                       Sign in to your account
                     </p>
                   </div>
-                  <GoogleButton HandleGoogleSignIn={HandleGoogleSignIn} />
+                  <GoogleButton
+                    isLoading={isLoading}
+                    HandleGoogleSignIn={HandleGoogleSignIn}
+                  />
                   <Separator />
                   <SignInForm
                     email={email}
                     password={password}
                     showPassword={showPassword}
+                    isLoading={isLoading}
+                    errorMessages={errorMessages}
                     setEmail={setEmail}
                     setPassword={setPassword}
                     HandleSignIn={HandleSignIn}
@@ -127,7 +137,10 @@ export default function CardAuthentication() {
                       Sign up to get started
                     </p>
                   </div>
-                  <GoogleButton HandleGoogleSignIn={HandleGoogleSignIn} />
+                  <GoogleButton
+                    isLoading={isLoading}
+                    HandleGoogleSignIn={HandleGoogleSignIn}
+                  />
                   <Separator />
                   <SignUpForm
                     email={email}
@@ -135,6 +148,8 @@ export default function CardAuthentication() {
                     confirmPassword={confirmPassword}
                     showPassword={showPassword}
                     showConfirmPassword={showConfirmPassword}
+                    isLoading={isLoading}
+                    errorMessages={errorMessages}
                     setEmail={setEmail}
                     setPassword={setPassword}
                     setConfirmPassword={setConfirmPassword}
