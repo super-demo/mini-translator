@@ -1,7 +1,12 @@
 "use client"
 
 import { FormEvent, useEffect, useState } from "react"
+import {
+  useCreateUserWithEmailAndPassword,
+  useSignInWithEmailAndPassword
+} from "react-firebase-hooks/auth"
 
+import { CreateUserSession } from "@/app/api/auth/actions"
 import { GoogleButton } from "@/app/authentication/_components/google-button"
 import SignInForm from "@/app/authentication/_components/signin-form"
 import SignUpForm from "@/app/authentication/_components/signup-form"
@@ -9,31 +14,56 @@ import AlongPath from "@/components/background/along-path"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { UseAuthContext } from "@/hooks/use-context"
+import { auth } from "@/config/firebase"
+import { SignInWithGoogle } from "@/lib/auth"
 
 export default function CardAuthentication() {
-  const { SignInWithGoogle } = UseAuthContext()
-
-  const [usersname, setUsername] = useState<string>("")
+  const [createUserWithEmailAndPassword] =
+    useCreateUserWithEmailAndPassword(auth)
+  const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth)
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
+  const [confirmPassword, setConfirmPassword] = useState<string>("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   async function HandleGoogleSignIn() {
     try {
-      await SignInWithGoogle()
+      const userUID = await SignInWithGoogle()
+      if (userUID) CreateUserSession({ uid: userUID })
     } catch (error) {
       console.error("Google sign in error:", error)
     }
   }
 
-  function HandleSignIn(e: FormEvent) {
+  async function HandleSignIn(e: FormEvent) {
     e.preventDefault()
-    console.log("Sign in attempted with:", email, password)
+
+    try {
+      const userID = await signInWithEmailAndPassword(email, password)
+      if (userID) CreateUserSession({ uid: userID.user.uid })
+    } catch (error) {
+      console.error("Sign in error:", error)
+    }
   }
 
-  function HandleSignUp(e: FormEvent) {
+  async function HandleSignUp(e: FormEvent) {
     e.preventDefault()
-    console.log("Sign up attempted with:", usersname, email, password)
+
+    try {
+      const userID = await createUserWithEmailAndPassword(email, password)
+      if (userID) CreateUserSession({ uid: userID.user.uid })
+    } catch (error) {
+      console.error("Sign up error:", error)
+    }
+  }
+
+  function HandleToggleShowPassword() {
+    setShowPassword(!showPassword)
+  }
+
+  function HandleToggleShowConfirmPassword() {
+    setShowConfirmPassword(!showConfirmPassword)
   }
 
   useEffect(() => {
@@ -81,9 +111,11 @@ export default function CardAuthentication() {
                   <SignInForm
                     email={email}
                     password={password}
+                    showPassword={showPassword}
                     setEmail={setEmail}
                     setPassword={setPassword}
                     HandleSignIn={HandleSignIn}
+                    HandleToggleShowPassword={HandleToggleShowPassword}
                   />
                 </div>
               </TabsContent>
@@ -98,13 +130,19 @@ export default function CardAuthentication() {
                   <GoogleButton HandleGoogleSignIn={HandleGoogleSignIn} />
                   <Separator />
                   <SignUpForm
-                    username={usersname}
                     email={email}
                     password={password}
-                    setUsername={setUsername}
+                    confirmPassword={confirmPassword}
+                    showPassword={showPassword}
+                    showConfirmPassword={showConfirmPassword}
                     setEmail={setEmail}
                     setPassword={setPassword}
+                    setConfirmPassword={setConfirmPassword}
                     HandleSignUp={HandleSignUp}
+                    HandleToggleShowPassword={HandleToggleShowPassword}
+                    HandleToggleShowConfirmPassword={
+                      HandleToggleShowConfirmPassword
+                    }
                   />
                 </div>
               </TabsContent>

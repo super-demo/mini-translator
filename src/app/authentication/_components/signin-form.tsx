@@ -1,5 +1,5 @@
 import { Label } from "@radix-ui/react-label"
-import { Lock, Mail } from "lucide-react"
+import { Eye, EyeOff, Lock, Mail } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input"
 interface SignInFormProps {
   email: string
   password: string
+  showPassword: boolean
   setEmail: (value: string) => void
   setPassword: (value: string) => void
   HandleSignIn: (e: React.FormEvent<HTMLFormElement>) => void
+  HandleToggleShowPassword: () => void
 }
 
 export default function SignInForm(props: SignInFormProps) {
@@ -19,7 +21,7 @@ export default function SignInForm(props: SignInFormProps) {
         <div className="space-y-2">
           <Label htmlFor="signin-email">Email</Label>
           <div className="relative">
-            <Mail className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+            <Mail className="absolute left-3 top-[10px] h-5 w-5 text-muted-foreground" />
             <Input
               id="signin-email"
               type="email"
@@ -34,16 +36,30 @@ export default function SignInForm(props: SignInFormProps) {
         <div className="space-y-2">
           <Label htmlFor="signin-password">Password</Label>
           <div className="relative">
-            <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+            <Lock className="absolute left-3 top-[10px] h-5 w-5 text-muted-foreground" />
             <Input
               id="signin-password"
-              type="password"
+              type={props.showPassword ? "text" : "password"}
               placeholder="Enter your password"
               className="pl-10"
               value={props.password}
               onChange={(e) => props.setPassword(e.target.value)}
               required
             />
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-0"
+              onClick={props.HandleToggleShowPassword}
+            >
+              {props.showPassword ? (
+                <Eye className="h-5 w-5 text-muted-foreground" />
+              ) : (
+                <EyeOff className="h-5 w-5 text-muted-foreground" />
+              )}
+            </Button>
           </div>
         </div>
       </div>

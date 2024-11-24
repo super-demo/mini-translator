@@ -1,11 +1,7 @@
 "use client"
 
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  User
-} from "firebase/auth"
+import { User } from "firebase/auth"
+import { SessionProvider } from "next-auth/react"
 import {
   createContext,
   ReactNode,
@@ -13,7 +9,6 @@ import {
   useEffect,
   useState
 } from "react"
-import { SessionProvider } from "next-auth/react"
 
 import { auth } from "@/config/firebase"
 
@@ -24,8 +19,6 @@ interface SiteContextType {
 interface AuthContextType {
   currentUser: User | null
   setCurrentUser: (user: User | null) => void
-  SignInWithGoogle: () => void
-  SignOut: () => void
 }
 
 interface RefContextType {
@@ -42,25 +35,6 @@ export function SiteProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const root = { isInteresting, setIsInteresting }
 
-  async function SignInWithGoogle() {
-    try {
-      const provider = new GoogleAuthProvider()
-      await signInWithPopup(auth, provider)
-    } catch (error) {
-      console.error("Google sign in error:", error)
-      throw error
-    }
-  }
-
-  async function SignOut() {
-    try {
-      await signOut(auth)
-    } catch (error) {
-      console.error("Sign out error:", error)
-      throw error
-    }
-  }
-
   useEffect(() => {
     if (!auth) return
 
@@ -75,9 +49,7 @@ export function SiteProvider({ children }: { children: ReactNode }) {
   return (
     <SessionProvider>
       <SiteContext.Provider value={{ root }}>
-        <AuthContext.Provider
-          value={{ currentUser, setCurrentUser, SignInWithGoogle, SignOut }}
-        >
+        <AuthContext.Provider value={{ currentUser, setCurrentUser }}>
           <RefContext.Provider value={{ isInteresting, setIsInteresting }}>
             {children}
           </RefContext.Provider>
