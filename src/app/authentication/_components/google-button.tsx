@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 
 interface GoogleButtonProps {
+  isLoading: boolean
   HandleGoogleSignIn: () => void
 }
 
@@ -10,6 +11,7 @@ export function GoogleButton(props: GoogleButtonProps) {
       variant="outline"
       className="w-full"
       onClick={props.HandleGoogleSignIn}
+      disabled={props.isLoading}
     >
       <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
         <path
