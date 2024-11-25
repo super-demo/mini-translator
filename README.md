@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Style Guides
 
 ## Getting Started
 
-First, run the development server:
+In order to run this app locally, you should have the following programs installed on your computer:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- [Node.js](https://nodejs.org/) version 20.0.0 or higher
+- [pnpm](https://yarnpkg.com/) version 9.0.0 or higher
+
+##### Clone this repository
+
+```
+git clone https://github.com/super-demo/mini-translator.git
+cd mini-translator
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+##### Install dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+##### Start the server
 
-## Learn More
+```
+pnpm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Components
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+/src/components
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+##### Api
 
-## Deploy on Vercel
+```
+/src/api
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Prerequisites
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Follow all folder and file structure formats
+- Use the provided global alias for all imports, `@/*` representing `./src/*`
+- Use the provided global alias for all imports, `@ui/*` representing `./src/components/ui/*`
+  ```
+  "paths": {
+    "@/*": [
+      "./src/*"
+    ],
+    "@ui/*": ["./src/components/ui/*"]
+  },
+  ```
+- Use Tailwind CSS exclusively.
+- UI components should be stored in `~/components/ui`
+
+## Contributing
+
+Please read the [CONTRIBUTING](./CONTRIBUTING.md) file before making any contributions.
