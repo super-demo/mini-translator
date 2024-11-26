@@ -1,49 +1,31 @@
-import type { NextRequest } from "next/server"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 
-const PROTECTED_PATHS = ["/conversation", "/profile", "/favorite"]
+import {
+  AUTHENTICATION_ROUTE,
+  PROTECTED_ROUTES,
+  ROOT_ROUTE,
+  TRANSLATOR_ROUTE
+} from "@/constants/routes"
+import { USER_SESSION, VISTED_SESSION } from "@/constants/utils"
 
-const isProtectedPath = (path: string): boolean => {
-  return PROTECTED_PATHS.some((protectedPath) => path.startsWith(protectedPath))
-}
+export default function middleware(request: NextRequest) {
+  const { pathname, origin } = request.nextUrl
+  const user = request.cookies.get(USER_SESSION)
+  const visited = request.cookies.get(VISTED_SESSION)
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  // const hasVisited = request.cookies.get("hasVisited")
-  const authToken = request.cookies.get("authToken")
-
-  if (isProtectedPath(pathname)) {
-    if (!authToken) {
-      const authentication = new URL("/authentication", request.url)
-      authentication.searchParams.set("callbackUrl", pathname)
-      return NextResponse.redirect(authentication)
-    }
+  if (visited && pathname === ROOT_ROUTE) {
+    const absoluteURL = new URL(TRANSLATOR_ROUTE, origin)
+    return NextResponse.redirect(absoluteURL.toString())
   }
 
-  // if (
-  //   hasVisited &&
-  //   (pathname === "/" || !pathname.startsWith("/translator")) &&
-  //   !isProtectedPath(pathname)
-  // ) {
-  //   return NextResponse.redirect(new URL("/translator", request.url))
-  // }
-
-  const response = NextResponse.next()
-
-  // if (!hasVisited && pathname === "/translator") {
-  //   response.cookies.set("hasVisited", "true", {
-  //     maxAge: 30 * 24 * 60 * 60,
-  //     path: "/",
-  //     secure: process.env.NODE_ENV === "production",
-  //     sameSite: "lax"
-  //   })
-  // }
-
-  return response
+  if (!user && PROTECTED_ROUTES.includes(pathname)) {
+    const absoluteURL = new URL(AUTHENTICATION_ROUTE, origin)
+    return NextResponse.redirect(absoluteURL.toString())
+  }
 }
 
 // Configure middleware matching paths
-export const config = {
+export const configPath = {
   matcher: [
     /*
      * Match all paths except:
@@ -52,8 +34,8 @@ export const config = {
      * 3. /_static (static files)
      * 4. /_vercel (Vercel internals)
      * 5. /favicon.ico, sitemap.xml (static files)
-     * 6. /login (login page)
+     * 6. /authentication (authentication page)
      */
-    "/((?!api|_next|_static|_vercel|favicon.ico|sitemap.xml|login).*)"
+    "/((?!api|_next|_static|_vercel|favicon.ico|sitemap.xml|authentication).*)"
   ]
 }

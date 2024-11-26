@@ -1,7 +1,9 @@
 "use client"
 
 import { CircleEllipsis } from "lucide-react"
+import { useRouter } from "next/navigation"
 
+import { RemoveUserSession } from "@/app/api/auth/actions"
 import { ThemeSwitch } from "@/components/header/theme-swtich"
 import {
   DropdownMenu,
@@ -11,8 +13,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
+import { AUTHENTICATION_ROUTE } from "@/constants/routes"
+import { UseAuthContext } from "@/hooks/use-context"
+import { SignOut } from "@/lib/auth"
 
 export function MenuDropdown() {
+  const { currentUser } = UseAuthContext()
+  const router = useRouter()
+
+  function HandleSignOut() {
+    SignOut()
+    RemoveUserSession()
+    router.push(AUTHENTICATION_ROUTE)
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -29,6 +43,11 @@ export function MenuDropdown() {
         <DropdownMenuItem>
           <p className="text-gray-300 dark:text-gray-600">Settings</p>
         </DropdownMenuItem>
+        {currentUser && (
+          <DropdownMenuItem onClick={HandleSignOut}>
+            <p>Sign out</p>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

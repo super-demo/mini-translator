@@ -1,9 +1,2 @@
-export const USER_NOT_FOUND = {
-  code: 404001,
-  message: "User not found."
-}
-
-export const TOKEN_EXPIRED = {
-  code: 403001,
-  message: "Token expired."
-}
+export const ACTION_FAILED_PLEASE_TRY_AGAIN = (action: string) =>
+  `${action} failed. Please try again.`
